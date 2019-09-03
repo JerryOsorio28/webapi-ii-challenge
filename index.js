@@ -68,10 +68,18 @@ server.post('/api/posts', (req, res) => {
 //Creates a comment for the post with the specified id using information sent inside of the request body.
 server.post('/api/posts/:id/comments', (req, res) => {
 
-    nextId = 10;
-    const comment = req.body; //fetch post from the body 
-    post.id = nextId++;
-    const id = req.params.id; // <-- fetchs comment ID.
+    const newComment = req.body; //fetch comment from the body 
+    const { id } = req.params; // <-- fetchs comment ID destructured.
+
+    DbFile.insertComment(comment)
+    .then(comment => {
+        if(comment){
+            res.status(201).json(comment)
+        }else{
+            res.status(400).json({ errorMessage: "Please provide text for the comment." })
+        }
+    })
+    .catch(err => res.status(500).json({ error: "There was an error while saving the post to the database" }))
     
 })
 // <------------------------------------------------------------------------- PUT REQUESTS ----------------
@@ -86,17 +94,18 @@ server.put('/api/posts/:id', (req, res) => {
 // <------------------------------------------------------------------------- DELETE REQUESTS ----------------
 //Removes the post with the specified id and returns the deleted post object.
 server.delete('/api/posts/:id', (req, res) => {
-    
-    nextId = 10;
-    const post = req.body; //fetch post from the body 
-    post.id = nextId++;
-    const id = req.params.id; // <-- fetchs posts ID.
-   
 
-    res.status(200).json({
-        url: `/api/posts/${id}`, 
-        operation: `DELETE post with id ${id}`
-    });
+    const postId = req.params.id; // <-- fetchs comment ID destructured.
+
+    DbFile.remove(postId)
+    .then( post => {
+        if(post){
+            res.status(200).json({ message: "Post has deleted successfully"})
+        }else{
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        }
+    })
+    .catch( err => res.status(500).json({ error: "The post could not be removed" }))
 })
 
 //Log in which port our server is listening for traffic
