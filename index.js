@@ -69,9 +69,9 @@ server.post('/api/posts', (req, res) => {
 server.post('/api/posts/:id/comments', (req, res) => {
 
     const newComment = req.body; //fetch comment from the body 
-    const { id } = req.params; // <-- fetchs comment ID destructured.
+    const id = req.params.id; // <-- fetchs comment ID destructured.
 
-    DbFile.insertComment(comment)
+    DbFile.insertComment(newComment)
     .then(comment => {
         if(comment){
             res.status(201).json(comment)
@@ -86,10 +86,18 @@ server.post('/api/posts/:id/comments', (req, res) => {
 //Updates the post with the specified id using data from the request body. Returns the modified document, NOT the original.
 server.put('/api/posts/:id', (req, res) => {
     
-    nextId = 10;
-    const post = req.body; //fetch post from the body 
-    post.id = nextId++;
-    const id = req.params.id; // <-- fetchs posts ID.
+    const postId = req.params.id; // <-- fetchs comment ID destructured.
+
+    DbFile.remove(postId)
+    .then( post => {
+        if(post){
+            res.status(200).json({ message: "Post has deleted successfully"})
+        }else{
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        }
+    })
+    .catch( err => res.status(500).json({ error: "The post could not be removed" }))
+
 });
 // <------------------------------------------------------------------------- DELETE REQUESTS ----------------
 //Removes the post with the specified id and returns the deleted post object.
