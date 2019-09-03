@@ -52,36 +52,46 @@ server.get('/api/posts/:id/comments', (req, res) => {
 //Creates a post using the information sent inside the request body.
 server.post('/api/posts', (req, res) => {
 
-    nextId = 10;
-    const post = req.body; 
-    post.id = nextId++;
+    const newPost = req.body; //fetch's new post from body
 
-    Posts.push(post)
-
-    res.status(201).json({
-        url: '/api/posts', operation: 'POST'
-    });
+    DbFile.insert(newPost)
+    .then(post => {
+        if(post){
+            res.status(201).json(post)
+        }else{
+            res.status(400).json({ errorMessage: "Please provide title and contents for the post." })
+        }
+    })
+    .catch(err => res.status(500).json({ error: "There was an error while saving the post to the database" }))
 })
 
 //Creates a comment for the post with the specified id using information sent inside of the request body.
 server.post('/api/posts/:id/comments', (req, res) => {
-    res.status(201).json({
-        url: '/api/posts/:id/comments', operation: 'POST'
-    });
+
+    nextId = 10;
+    const comment = req.body; //fetch post from the body 
+    post.id = nextId++;
+    const id = req.params.id; // <-- fetchs comment ID.
+    
 })
 // <------------------------------------------------------------------------- PUT REQUESTS ----------------
 //Updates the post with the specified id using data from the request body. Returns the modified document, NOT the original.
 server.put('/api/posts/:id', (req, res) => {
-    res.status(200).json({
-        url: `/api/posts/${id}`, operation: 'PUT'
-    })
+    
+    nextId = 10;
+    const post = req.body; //fetch post from the body 
+    post.id = nextId++;
+    const id = req.params.id; // <-- fetchs posts ID.
 });
 // <------------------------------------------------------------------------- DELETE REQUESTS ----------------
 //Removes the post with the specified id and returns the deleted post object.
 server.delete('/api/posts/:id', (req, res) => {
-
+    
+    nextId = 10;
+    const post = req.body; //fetch post from the body 
+    post.id = nextId++;
     const id = req.params.id; // <-- fetchs posts ID.
-    console.log(req.params)
+   
 
     res.status(200).json({
         url: `/api/posts/${id}`, 
