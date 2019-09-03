@@ -10,38 +10,43 @@ server.use(express.json())
 //Assign port that our server will be listening for traffic
 const port = 8000;
 
-// //Pulls posts data
-// const Posts = require('./data/seeds/01-posts');
-
-// //Pulls comments data
-// const Comments = require('./data/seeds/02-comments');
-
 const DbFile = require('./data/db'); //<-- pulls our data base
-
-
 
 // <------------------------------------------------------------------------- GET REQUESTS ----------------
 //Returns an array of all the post objects contained in the database.
 server.get('/api/posts', (req, res) => {
+
     DbFile.find()
     .then(posts => res.status(200).json(posts))
+    .catch(err => res.status(500).json({ message: "The posts information could not be retrieved." }))
 });
 
 //Returns the post object with the specified id.
 server.get('/api/posts/:id', (req, res) => {
 
-    const id = req.params.id; // <-- fetchs posts ID.
+    const id = req.params.id; // <-- fetchs post ID.
 
     DbFile.findById(id)
     .then(post => {res.status(200).json(post)})
-    
+
     .catch(err => res.status(404).json({ message: "The post with the specified ID does not exist." }))
 
 });
 
 //Returns an array of all the comment objects associated with the post with the specified id.
 server.get('/api/posts/:id/comments', (req, res) => {
-    res.send("It's working")
+
+    const id = req.params.id; // <-- fetchs post ID.
+
+    DbFile.findCommentById(id)
+    .then(comment => {
+        if(comment){
+            res.status(200).json(comment)
+        }else{
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        }
+    })
+    .catch(err => res.status(500).json({ error: "The post information could not be retrieved." }))
 });
 // <------------------------------------------------------------------------- POST REQUESTS ----------------
 //Creates a post using the information sent inside the request body.
