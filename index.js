@@ -87,11 +87,12 @@ server.post('/api/posts/:id/comments', (req, res) => {
 server.put('/api/posts/:id', (req, res) => {
     
     const postId = req.params.id; // <-- fetchs comment ID destructured.
+    const update = req.body;
 
-    DbFile.remove(postId)
-    .then( post => {
-        if(post){
-            res.status(200).json({ message: "Post has deleted successfully"})
+    DbFile.update(postId, update)
+    .then( updated => {
+        if(update){
+            res.status(200).json(updated)
         }else{
             res.status(404).json({ message: "The post with the specified ID does not exist." })
         }
